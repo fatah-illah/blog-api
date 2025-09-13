@@ -5,12 +5,13 @@ import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Seconds, Span}
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import java.time.Instant
 import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
 import slick.jdbc.H2Profile.api._
 
-class PostRepositorySpec extends AnyWordSpec with BeforeAndAfterAll with ScalaFutures {
+class PostRepositorySpec extends AnyWordSpec with BeforeAndAfterAll with ScalaFutures with Matchers {
   implicit override val patienceConfig = PatienceConfig(timeout = Span(5, Seconds))
   
   private var db: Database = _
@@ -21,26 +22,26 @@ class PostRepositorySpec extends AnyWordSpec with BeforeAndAfterAll with ScalaFu
   
   override def beforeAll(): Unit = {
     // Setup in-memory database for testing
-    db = Database.forURL("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", driver = "org.h2.Driver")
+    db = Database.forURL("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;MODE=PostgreSQL", driver = "org.h2.Driver")
     postRepository = new PostRepository(db)
     
-    // Create schema
+    // Create schema with proper case sensitivity
     val setup = DBIO.seq(
       sqlu"""
-        CREATE TABLE users (
-          id UUID PRIMARY KEY,
-          name VARCHAR(255) NOT NULL,
-          email VARCHAR(255) UNIQUE NOT NULL,
-          password_hash VARCHAR(255) NOT NULL
+        CREATE TABLE "users" (
+          "id" UUID PRIMARY KEY,
+          "name" VARCHAR(255) NOT NULL,
+          "email" VARCHAR(255) UNIQUE NOT NULL,
+          "password_hash" VARCHAR(255) NOT NULL
         )
       """,
       sqlu"""
-        CREATE TABLE posts (
-          id UUID PRIMARY KEY,
-          content TEXT NOT NULL,
-          created_at TIMESTAMP NOT NULL,
-          updated_at TIMESTAMP NOT NULL,
-          author_id UUID NOT NULL
+        CREATE TABLE "posts" (
+          "id" UUID PRIMARY KEY,
+          "content" TEXT NOT NULL,
+          "created_at" TIMESTAMP NOT NULL,
+          "updated_at" TIMESTAMP NOT NULL,
+          "author_id" UUID NOT NULL
         )
       """
     )

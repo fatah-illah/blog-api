@@ -7,6 +7,7 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
 import com.nolimit.blog.service.{JwtService, UserService, PostService}
 import com.nolimit.blog.domain._
+import com.nolimit.blog.domain.CirceFormats._
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 import io.circe.generic.auto._
 import scala.concurrent.Future
@@ -34,7 +35,13 @@ class RoutesSpec extends AnyWordSpec with Matchers with ScalatestRouteTest {
   }
   
   class MockPostService extends PostService(null) {
-    val testPost = Post(PostId(UUID.randomUUID()), "Test content", Instant.now(), Instant.now(), testUserId)
+    val testPost = com.nolimit.blog.domain.Post(
+      id = PostId(UUID.randomUUID()),
+      content = "Test content",
+      createdAt = Instant.now(),
+      updatedAt = Instant.now(),
+      authorId = testUserId
+    )
     
     override def getAllPosts: Future[Seq[Post]] = {
       Future.successful(Seq(testPost))
@@ -51,9 +58,9 @@ class RoutesSpec extends AnyWordSpec with Matchers with ScalatestRouteTest {
   
   class MockJwtService extends JwtService("test-secret") {
     override def createToken(userId: String): String = testToken
-    override def validateToken(token: String): Either[String, String] = {
-      if (token == testToken) Right(testUserId.value.toString)
-      else Left("Invalid token")
+    override def validateToken(token: String): scala.util.Try[String] = {
+      if (token == testToken) scala.util.Success(testUserId.value.toString)
+      else scala.util.Failure(new Exception("Invalid token"))
     }
   }
   

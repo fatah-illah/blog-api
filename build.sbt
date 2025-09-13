@@ -39,5 +39,10 @@ libraryDependencies ++= Seq(
   
   // Testing
   "org.scalatest" %% "scalatest" % "3.2.15" % Test,
-  "com.typesafe.akka" %% "akka-http-testkit" % AkkaHttpVersion % Test
+  "com.typesafe.akka" %% "akka-http-testkit" % AkkaHttpVersion % Test,
+  "com.typesafe.akka" %% "akka-testkit" % AkkaVersion % Test,
+  "com.h2database" % "h2" % "2.1.214" % Test
 )
+
+// Test configuration
+Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary
