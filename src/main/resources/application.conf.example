@@ -1,0 +1,23 @@
+akka {
+  http {
+    server {
+      parsing {
+        max-content-length = 10m
+      }
+    }
+  }
+}
+
+jwt {
+  secret = "your-256-bit-secret-change-this-in-production"
+  expiration = "24 hours"
+}
+
+database {
+  properties {
+    url = "jdbc:postgresql://localhost:5432/blogdb"
+    user = "postgres"
+    password = "your-database-password"
+  }
+  numThreads = 10
+}
